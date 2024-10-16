@@ -7,14 +7,14 @@ const { authMiddleware } = require("../middleware");
 const router = express.Router();
 
 const signUpSchema = zod.object({
-  username: zod.string().email(),
+  userName: zod.string().email(),
   password: zod.string(),
   firstName: zod.string(),
   lastName: zod.string(),
 });
 
 const signInSchema = zod.object({
-  username: zod.string().email(),
+  userName: zod.string().email(),
   password: zod.string(),
 });
 
@@ -28,17 +28,18 @@ const updateSchema = zod.object({
 router.post("/signup", async (req, res) => {
   const body = req.body;
   const { success } = signUpSchema.safeParse(body);
+
   if (!success) {
     return res.status(411).json({
       message: "Email already in use / Invalid inputs",
     });
   }
 
-  const existingUser = User.findOne({
-    username: body.username,
+  const existingUser = await User.findOne({
+    userName: body.userName,
   });
 
-  if (existingUser._id) {
+  if (existingUser) {
     return res.status(411).json({
       message: "Email already in use / Invalid inputs",
     });
@@ -71,7 +72,7 @@ router.post("/signin", async (req, res) => {
   }
 
   const existingUser = await User.findOne({
-    username: body.username,
+    userName: body.userName,
     password: body.password,
   });
 
@@ -125,7 +126,7 @@ router.get("/bulk", async (req, res) => {
 
   res.json({
     users: users.map((user) => ({
-      username: user.username,
+      userName: user.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       _id: user._id,
