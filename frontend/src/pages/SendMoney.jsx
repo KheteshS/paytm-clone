@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const SendMoney = () => {
   const [searchParams] = useSearchParams();
@@ -8,6 +8,7 @@ const SendMoney = () => {
   const name = searchParams.get("name");
 
   const [amount, setAmount] = useState(0);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -41,7 +42,7 @@ const SendMoney = () => {
             <button
               className="w-full h-10 bg-green-500 text-white rounded-md text-sm font-medium"
               onClick={async () => {
-                await axios.post(
+                const response = await axios.post(
                   "http://localhost:3000/api/v1/account/transfer",
                   {
                     to: id,
@@ -53,6 +54,9 @@ const SendMoney = () => {
                     },
                   }
                 );
+                if (response.status === 200) {
+                  navigate("/dashboard");
+                }
               }}
             >
               Initiate Transfer
