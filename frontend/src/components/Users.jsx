@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Button from "./Button";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Users = () => {
   const [users, setUsers] = useState([
@@ -11,6 +13,16 @@ const Users = () => {
     },
   ]);
 
+  const [filter, setFilter] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/v1/user/bulk?filter=" + filter)
+      .then((res) => {
+        setUsers(res.data.users);
+      });
+  }, [filter]);
+
   return (
     <>
       <div className="font-bold mt-6 text-lg">Users</div>
@@ -19,6 +31,7 @@ const Users = () => {
           type="text"
           placeholder="Search users..."
           className="w-full px-2 py-1 border rounded border-slate-200"
+          onChange={(e) => setFilter(e.target.value)}
         ></input>
       </div>
       <div>
@@ -31,6 +44,8 @@ const Users = () => {
 };
 
 const User = ({ user }) => {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="flex justify-between items-center">
@@ -44,7 +59,12 @@ const User = ({ user }) => {
         </div>
 
         <div>
-          <Button label={"Send Money"} />
+          <Button
+            label={"Send Money"}
+            onClick={() => {
+              navigate("/send?id=" + user._id + "&name=" + user.firstName);
+            }}
+          />
         </div>
       </div>
     </>
