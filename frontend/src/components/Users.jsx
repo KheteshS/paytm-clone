@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Button from "./Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import useDebounce from "../hooks/useDebounce";
 
 const Users = () => {
   const [users, setUsers] = useState([
@@ -14,14 +15,15 @@ const Users = () => {
   ]);
 
   const [filter, setFilter] = useState("");
+  const debouncedValue = useDebounce(filter, 500);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/v1/user/bulk?filter=" + filter)
+      .get("http://localhost:3000/api/v1/user/bulk?filter=" + debouncedValue)
       .then((res) => {
         setUsers(res.data.users);
       });
-  }, [filter]);
+  }, [debouncedValue]);
 
   return (
     <>
@@ -30,6 +32,7 @@ const Users = () => {
         <input
           type="text"
           placeholder="Search users..."
+          value={filter}
           className="w-full px-2 py-1 border rounded border-slate-200"
           onChange={(e) => setFilter(e.target.value)}
         ></input>
